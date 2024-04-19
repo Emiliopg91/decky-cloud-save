@@ -28,6 +28,9 @@ jobs:
           git config --global user.email "ojosdeserbio@gmail.com"
           npm version ${{ github.event.head_commit.message }}
 
+      - name: Commit version change
+        uses: stefanzweifel/git-auto-commit-action@v5
+
       - name: Build
         run:  pnpm run build
 
