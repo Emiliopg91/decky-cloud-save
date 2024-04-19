@@ -102,7 +102,7 @@ jobs:
           npm version ${{ github.event.head_commit.message }}
 
       - name: Retrieve version
-        run: echo "GITHUB_PROJ_VERS=$(echo npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
+        run: echo "GITHUB_PROJ_VERS=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
 
       - name: Prepare folders
         run: |
