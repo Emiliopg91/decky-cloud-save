@@ -97,7 +97,7 @@ jobs:
           node-version: '21'
 
       - name: Retrieve version
-        run: echo 'GITHUB_PROJ_VERS=$(echo npm pkg get version | sed 's/"//g')' >> $GITHUB_ENV
+        run: echo "GITHUB_PROJ_VERS=$(echo npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
 
       - name: Prepare folders
         run: |
