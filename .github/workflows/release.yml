@@ -29,6 +29,7 @@ jobs:
           npm version ${{ github.event.head_commit.message }}
           git add package.json
           git commit -m "[skip ci] Version update"
+          git push
 
       - name: Build
         run:  pnpm run build
