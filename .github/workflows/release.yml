@@ -42,7 +42,9 @@ jobs:
 
       - name: Align branches
         run: |
-          git checkout develop
+          git remote update
+          git fetch 
+          git checkout --track origin/develop
           git reset --hard main --
           git push --force
 
