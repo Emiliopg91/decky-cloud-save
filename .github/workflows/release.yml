@@ -27,7 +27,6 @@ jobs:
           git config --global user.name "CICD"
           git config --global user.email "ojosdeserbio@gmail.com"
           npm version ${{ github.event.head_commit.message }}
-          echo npm pkg get version | sed 's/"//g'
 
       - name: Build
         run:  pnpm run build
@@ -96,6 +95,12 @@ jobs:
         with:
           node-version: '21'
 
+      - name: Change version
+        run: |
+          git config --global user.name "CICD"
+          git config --global user.email "ojosdeserbio@gmail.com"
+          npm version ${{ github.event.head_commit.message }}
+
       - name: Retrieve version
         run: echo "GITHUB_PROJ_VERS=$(echo npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
 
@@ -104,7 +109,7 @@ jobs:
           mkdir output/bin
           cp rclone/rclone output/bin 
           mv output decky-cloud-save 
-          zip decky-cloud-save-$GITHUB_PROJ_VERS.zip decky-cloud-save
+          zip decky-cloud-save-${{ env.GITHUB_PROJ_VERS }}.zip decky-cloud-save
           cd ..
 
       - name: Create Release
@@ -113,8 +118,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: $GITHUB_PROJ_VERS
-          release_name: Release $GITHUB_PROJ_VERS
+          tag_name: ${{ env.GITHUB_PROJ_VERS }}
+          release_name: Release ${{ env.GITHUB_PROJ_VERS }}
           draft: false
           prerelease: false
 
@@ -126,5 +131,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./decky-cloud-save/decky-cloud-save-$GITHUB_PROJ_VERS.zip
-          asset_name: decky-cloud-save-$GITHUB_PROJ_VERS.zip
+          asset_name: decky-cloud-save-${{ env.GITHUB_PROJ_VERS }}.zip
           asset_content_type: application/zip
