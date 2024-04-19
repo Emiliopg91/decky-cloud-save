@@ -40,6 +40,12 @@ jobs:
           git commit -m "[skip ci] Version update"
           git push
 
+      - name: Align branches
+        run: |
+          git checkout branch-name
+          git reset --hard main --
+          git push --force
+
       - name: Build
         run:  pnpm run build
 
