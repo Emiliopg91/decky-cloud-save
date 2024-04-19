@@ -99,10 +99,10 @@ jobs:
           node-version: '21'
 
       - name: Change version
-        run: |
-          git config --global user.name "CICD"
-          git config --global user.email "ojosdeserbio@gmail.com"
-          npm version ${{ github.event.head_commit.message }}
+        uses: reedyuk/npm-version@1.1.1
+        with:
+          version: ${{ github.event.head_commit.message }}
+          git-tag-version: 'false'
 
       - name: Retrieve version
         run: echo "GITHUB_PROJ_VERS=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
