@@ -133,3 +133,4 @@ jobs:
           asset_path: ./decky-cloud-save/decky-cloud-save-${{ env.GITHUB_PROJ_VERS }}.zip
           asset_name: decky-cloud-save-${{ env.GITHUB_PROJ_VERS }}.zip
           asset_content_type: application/zip
+
