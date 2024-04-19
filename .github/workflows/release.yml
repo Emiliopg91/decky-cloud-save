@@ -98,6 +98,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Updating repository
+        run: |
+          git config --global user.name "CICD"
+          git config --global user.email "ojosdeserbio@gmail.com"
+          git pull
         
       - name: Download artifacts
         uses: actions/download-artifact@v4
