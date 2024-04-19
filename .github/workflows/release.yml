@@ -42,7 +42,7 @@ jobs:
 
       - name: Align branches
         run: |
-          git checkout branch-name
+          git checkout develop
           git reset --hard main --
           git push --force
 
@@ -151,4 +151,3 @@ jobs:
           asset_path: ./decky-cloud-save-${{ env.GITHUB_PROJ_VERS }}.zip
           asset_name: decky-cloud-save-${{ env.GITHUB_PROJ_VERS }}.zip
           asset_content_type: application/zip
- 
