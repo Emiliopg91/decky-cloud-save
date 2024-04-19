@@ -8,6 +8,7 @@ on:
 jobs:
   npmRunBuild:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -38,8 +39,6 @@ jobs:
           git add package.json
           git commit -m "[skip ci] Version update"
           git push
-          git tag ${{ env.GITHUB_PROJ_VERS }}
-          git push origin --tags
 
       - name: Build
         run:  pnpm run build
