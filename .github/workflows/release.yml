@@ -96,16 +96,16 @@ jobs:
         with:
           node-version: '21'
 
+      - name: Retrieve version
+        run: echo ::set-env name=version::$(cat VERSION)
+
       - name: Prepare folders
         run: |
           mkdir output/bin
           cp rclone/rclone output/bin 
           mv output decky-cloud-save 
-          zip decky-cloud-save.zip decky-cloud-save
+          zip decky-cloud-save-${{ env.version }}.zip decky-cloud-save
           cd ..
-
-      - name: Retrieve version
-        run: echo GITHUB_PROJ_VERS=$(echo npm pkg get version | sed 's/"//g') >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -113,8 +113,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.env.GITHUB_PROJ_VERS }}
-          release_name: Release ${{ github.env.GITHUB_PROJ_VERS }}
+          tag_name: ${{ env.version }}
+          release_name: Release ${{ env.version }}
           draft: false
           prerelease: false
 
@@ -125,6 +125,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./decky-cloud-save/decky-cloud-save.zip
-          asset_name: decky-cloud-save.zip
+          asset_path: ./decky-cloud-save/decky-cloud-save-${{ env.version }}.zip
+          asset_name: decky-cloud-save-${{ env.version }}.zip
           asset_content_type: application/zip
