@@ -1,11 +1,9 @@
 name: Build and Publish Release
 
 on:
-  workflow_dispatch: 
-    inputs:
-      releaseVersion:
-        description: 'Release version'
-        required: true
+  push: 
+    branches:
+      - main
 
 jobs:
   npmRunBuild:
@@ -24,14 +22,34 @@ jobs:
           npm install -g pnpm@8.5.1 shx@0.3.4
           pnpm install
 
+      - name: Change version
+        run: |
+          npm version ${{ github.event.head_commit.message }}
+          echo npm pkg get version | sed 's/"//g'
+
       - name: Build
-        run: pnpm run build
+        run: |
+          pnpm i
+          pnpm run build
+
+      - name: Prepare folders
+        run: |
+          mkdir output
+          cp -r dist output/dist
+          cp -r defaults/quickstart output/quickstart 
+          cp defaults/rclone output/rclone
+          cp decky_plugin.pyi output/decky_plugin.pyi
+          cp LICENSE output/LICENSE
+          cp main.py output/main.py
+          cp package.json output/package.json
+          cp plugin.json output/plugin.json
+          cp README.md output/README.md
 
       - name: Archive dist folder
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist
+          name: output
+          path: output
           retention-days: 1
 
   downloadRclone:
@@ -48,13 +66,11 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build Docker image
-        run: |
-          docker build -t my_backend_image ./backend
+        run: docker build -t my_backend_image ./backend
         working-directory: ${{ github.workspace }}
 
       - name: Run Docker container
-        run: |
-          docker run -v ${{ github.workspace }}/backend:/backend my_backend_image
+        run: docker run -v ${{ github.workspace }}/backend:/backend my_backend_image
         working-directory: ${{ github.workspace }}
 
       - name: Archive rclone folder
@@ -75,22 +91,21 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+
       - name: Prepare folders
         run: |
-          mkdir decky-cloud-save decky-cloud-save/bin
-          cp -r dist decky-cloud-save/dist
-          cp -r defaults/quickstart decky-cloud-save/quickstart 
-          cp defaults/rclone decky-cloud-save/rclone
-          cp rclone/rclone decky-cloud-save/bin 
-          cp decky_plugin.pyi decky-cloud-save/decky_plugin.pyi
-          cp LICENSE decky-cloud-save/LICENSE
-          cp main.py decky-cloud-save/main.py
-          cp package.json decky-cloud-save/package.json
-          cp plugin.json decky-cloud-save/plugin.json
-          cp README.md decky-cloud-save/README.md
-          cd decky-cloud-save
-          zip decky-cloud-save.zip *
+          mkdir output/bin
+          cp rclone/rclone output/bin 
+          mv output decky-cloud-save 
+          zip decky-cloud-save.zip decky-cloud-save
           cd ..
+
+      - name: Retrieve version
+        run: echo GITHUB_PROJ_VERS=$(echo npm pkg get version | sed 's/"//g') >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -98,8 +113,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.releaseVersion }}
-          release_name: Release ${{ github.event.inputs.releaseVersion }}
+          tag_name: ${{ github.env.GITHUB_PROJ_VERS }}
+          release_name: Release ${{ github.env.GITHUB_PROJ_VERS }}
           draft: false
           prerelease: false
 
