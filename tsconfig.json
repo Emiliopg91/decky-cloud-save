@@ -18,6 +18,6 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["src", "assets/languages/en.ts", "assets/languages/es.ts", "assets/languages/fr.ts", "assets/languages/ge.ts", "assets/languages/pt.ts"],
   "exclude": ["node_modules"]
 }
