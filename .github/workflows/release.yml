@@ -28,6 +28,19 @@ jobs:
           version: ${{ github.event.head_commit.message }}
           git-tag-version: 'false'
 
+      - name: Retrieve version
+        run: echo "GITHUB_PROJ_VERS=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
+
+      - name: Commit version change
+        run: |
+          git config --global user.name "CICD"
+          git config --global user.email "ojosdeserbio@gmail.com"
+          git add package.json
+          git commit -m "[skip ci] Version update"
+          git push
+          git tag ${{ env.GITHUB_PROJ_VERS }}
+          git push origin --tags
+
       - name: Build
         run:  pnpm run build
 
@@ -94,9 +107,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '21'
-
-      - name: Retrieve version
-        run: echo "GITHUB_PROJ_VERS=$(npm pkg get version | sed 's/\"//g')" >> $GITHUB_ENV
 
       - name: Prepare folders
         run: |
