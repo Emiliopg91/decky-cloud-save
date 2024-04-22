@@ -1,6 +1,6 @@
 import { ButtonItem, ConfirmModal, Navigation, PanelSection, PanelSectionRow, showModal, sleep } from "decky-frontend-lib";
 import { useEffect, useState } from "react";
-import { ImOnedrive, ImDropbox, ImHome } from "react-icons/im";
+import { ImOnedrive, ImDropbox, ImHome, ImGoogleDrive } from "react-icons/im";
 import { BsGearFill, BsPatchQuestionFill } from "react-icons/bs";
 import Container from "../components/Container";
 import { PageProps } from "../helpers/types";
@@ -52,7 +52,7 @@ export default function ConfigureBackendPage({ serverApi }: PageProps<{}>) {
             <BsGearFill />
           </ButtonItem>
         </PanelSectionRow>
-        {/* <PanelSectionRow>
+        <PanelSectionRow>
           <ButtonItem
             onClick={() => openConfig("drive")}
             icon={<ImGoogleDrive />}
@@ -60,7 +60,7 @@ export default function ConfigureBackendPage({ serverApi }: PageProps<{}>) {
           >
             <BsGearFill />
           </ButtonItem>
-        </PanelSectionRow> */}
+        </PanelSectionRow>
         <PanelSectionRow>
           <ButtonItem onClick={() => openConfig("dropbox")} icon={<ImDropbox />} label="Dropbox">
             <BsGearFill />
