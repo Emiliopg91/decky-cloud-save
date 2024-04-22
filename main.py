@@ -5,7 +5,7 @@ import process_utils
 from rclone_setup_manager import RcloneSetupManager
 from rclone_sync_manager import RcloneSyncManager
 
-decky_plugin.logger.setLevel("DEBUG")
+decky_plugin.logger.setLevel("INFO")
 
 class Plugin:
     manager_setup = RcloneSetupManager()
