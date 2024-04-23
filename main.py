@@ -94,10 +94,11 @@ class Plugin:
                 if "Sync finished" in line:
                     record = True
             else:
-                if "Running command: /home/deck/homebrew/plugins/decky-cloud-save/rclone" in line.strip():
+                if "Running command: /home/deck/homebrew/plugins/decky-cloud-save/bin/rcloneLauncher" in line.strip():
                     return log
                 else:
                     log = line + '\n' + log  
+        return log
 
 # Lifecycle
 
