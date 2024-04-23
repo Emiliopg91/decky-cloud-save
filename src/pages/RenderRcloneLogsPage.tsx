@@ -24,7 +24,7 @@ export default function ConfigurePathsPage() {
         }}>
           {Translator.translate("sync.now")}
         </button>
-        <button hidden={isHidden} onClick={() => {
+        <button hidden={isHidden} style={{ marginLeft: "10px" }} onClick={() => {
           Navigation.CloseSideMenus();
           Navigation.NavigateBack();
           let winner = "path1"
