@@ -34,38 +34,45 @@ export default definePlugin((serverApi: ServerAPI) => {
       Logger.info("Stopped game '" + game.strDisplayName + "' (" + e.unAppID + ")");
     }
     if (ApplicationState.getAppState().currentState.sync_on_game_exit === "true") {
-      /*if (game.bCloudAvailable && game.bCloudEnabledForApp && game.bCloudEnabledForAccount) {
-        Logger.info("Skipping due to Cloud Save");
-      } else {*/
-      Logger.info("Synchronizing")
-      let toast = ApplicationState.getAppState().currentState.toast_auto_sync === "true";
-      if (e.bRunning) {
-        if (toast) {
-          Toast.toast(Translator.translate("synchronizing.savedata"), 2000);
-        }
-        ApiClient.syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
+      let sync: boolean = false;
+      if (game.iInstallFolder == -1) {
+        sync = true;
+        Logger.info("Non Steam game, proceed");
+      } else if (game.bCloudAvailable && game.bCloudEnabledForApp && game.bCloudEnabledForAccount) {
+        Logger.info("Game with enabled Steam Cloud, skipping");
       } else {
-        ApiClient.syncOnEnd(toast);
+        Logger.info("Steam game with Steam Cloud disabled, proceed")
+        sync = true
       }
-      /*}
+
+      if (sync) {
+        let toast = ApplicationState.getAppState().currentState.toast_auto_sync === "true";
+        if (e.bRunning) {
+          if (toast) {
+            Toast.toast(Translator.translate("synchronizing.savedata"), 2000);
+          }
+          ApiClient.syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
+        } else {
+          ApiClient.syncOnEnd(toast);
+        }
+      }
     } else {
       Logger.info("No futher actions")
-    }*/
     }
   });
 
-  Storage.clearAllSessionStorage()
+Storage.clearAllSessionStorage()
 
-  return {
-    title: <div className={staticClasses.Title}>Decky Cloud Save</div>,
-    content: <Content />,
-    icon: <FaSave />,
-    onDismount() {
-      serverApi.routerHook.removeRoute("/dcs-configure-paths");
-      serverApi.routerHook.removeRoute("/dcs-configure-backend");
-      serverApi.routerHook.removeRoute("/dcs-configure-logs");
-      removeGameExecutionListener();
-      Storage.clearAllSessionStorage()
-    },
-  };
+return {
+  title: <div className={staticClasses.Title}>Decky Cloud Save</div>,
+  content: <Content />,
+  icon: <FaSave />,
+  onDismount() {
+    serverApi.routerHook.removeRoute("/dcs-configure-paths");
+    serverApi.routerHook.removeRoute("/dcs-configure-backend");
+    serverApi.routerHook.removeRoute("/dcs-configure-logs");
+    removeGameExecutionListener();
+    Storage.clearAllSessionStorage()
+  },
+};
 });

@@ -9,6 +9,7 @@ import { Processes } from "./processes";
 
 export class ApiClient {
   public static async syncNowInternal(showToast: boolean, winner: string, resync: boolean = false): Promise<void> {
+    Logger.info("Synchronizing")
     const start = new Date();
     if (Storage.getSessionStorageItem("syncing") === "true") {
       Toast.toast(Translator.translate("waiting.previous"), 2000);
@@ -34,7 +35,7 @@ export class ApiClient {
     }
 
     const timeDiff = ((new Date().getTime() - start.getTime()) / 1000);
-    Logger.info("Sync finished in " + timeDiff);
+    Logger.info("Sync finished in " + timeDiff + "s");
 
     let pass;
     switch (exitCode) {
