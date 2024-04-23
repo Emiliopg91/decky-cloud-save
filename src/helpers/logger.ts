@@ -1,47 +1,46 @@
 import { Backend } from "./backend";
 
+enum LogLevel {
+    DEBUG = 0,
+    INFO = 1,
+    WARN = 2,
+    ERROR = 3
+}
+
 export class Logger {
 
     private static prefix: string = "[DCS]";
-
-    private static isDebugEnabled = false;
-    private static isInfoEnabled = true;
-    private static isWarnEnabled = true;
+    private static currentLevel = LogLevel.INFO;
 
     public static async initialize() {
         const level: string = await Backend.backend_call<{}, string>("get_log_level", {});
-
-        if (level == "DEBUG")
-            Logger.isDebugEnabled = true;
-        if (level == "DEBUG" || level == "INFO")
-            Logger.isInfoEnabled = true;
-        if (level == "DEBUG" || level == "INFO" || level == "WARN")
-            Logger.isWarnEnabled = true;
-
-        Logger.log("INFO", "Logger initialized at level '" + level + "'");
+        this.currentLevel = LogLevel[level as keyof typeof LogLevel];
+        Logger.log(LogLevel.INFO, "Logger initialized at level '" + LogLevel[this.currentLevel] + "'");
     }
 
-    private static log(lvl: "DEBUG" | "INFO" | "WARN" | "ERROR", ...args: any) {
-        Backend.backend_call<{ level: string, msg: string }, void>("log", { level: lvl, msg: "" + args });
-        console.log(Logger.prefix + "[" + lvl + "]", ...args);
+    private static log(lvl: LogLevel, ...args: any) {
+        if (Logger.isLevelEnabled(lvl)) {
+            Backend.backend_call<{ level: string, msg: string }, void>("log", { level: LogLevel[lvl], msg: "" + args });
+            console.log(Logger.prefix + "[" + LogLevel[lvl] + "]", ...args);
+        }
+    }
+    private static isLevelEnabled(lvl: LogLevel): boolean {
+        return this.currentLevel <= lvl;
     }
 
     public static debug(...args: any) {
-        if (Logger.isDebugEnabled)
-            Logger.log("DEBUG", ...args);
+        Logger.log(LogLevel.DEBUG, ...args);
     }
 
     public static info(...args: any) {
-        if (Logger.isInfoEnabled)
-            Logger.log("INFO", ...args);
+        Logger.log(LogLevel.INFO, ...args);
     }
 
     public static warn(...args: any) {
-        if (Logger.isWarnEnabled)
-            Logger.log("WARN", ...args);
+        Logger.log(LogLevel.WARN, ...args);
     }
 
     public static error(...args: any) {
-        Logger.log("ERROR", ...args);
+        Logger.log(LogLevel.ERROR, ...args);
     }
 }
