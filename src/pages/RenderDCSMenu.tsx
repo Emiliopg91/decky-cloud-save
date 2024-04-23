@@ -8,6 +8,7 @@ import Head from "../components/Head";
 import DeckyStoreButton from "../components/DeckyStoreButton";
 import { ApplicationState } from "../helpers/state";
 import { Translator } from "../helpers/translator";
+import { Logger } from "../helpers/logger";
 
 // TODO
 export const Content: VFC<{}> = () => {
@@ -24,7 +25,10 @@ export const Content: VFC<{}> = () => {
       <Head />
       <PanelSection title={Translator.translate("sync")}>
         <PanelSectionRow>
-          <ButtonItem layout="below" disabled={appState.syncing === "true" || !hasProvider} onClick={() => ApiClient.syncNow(true)}>
+          <ButtonItem layout="below" disabled={appState.syncing === "true" || !hasProvider} onClick={() => {
+            Logger.info("Synchronizing"); 
+            ApiClient.syncNow(true); 
+          }}>
             <DeckyStoreButton icon={<FaSave className={appState.syncing === "true" ? "dcs-rotate" : ""} />}>{Translator.translate("sync.now")}</DeckyStoreButton>
           </ButtonItem>
           {hasProvider === false && <small>{Translator.translate("provider.not.configured")}.</small>}

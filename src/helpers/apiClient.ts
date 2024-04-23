@@ -33,7 +33,8 @@ export class ApiClient {
       await sleep(360);
     }
 
-    Logger.info("Sync finished")
+    const timeDiff = ((new Date().getTime() - start.getTime()) / 1000);
+    Logger.info("Sync finished in " + timeDiff);
 
     let pass;
     switch (exitCode) {
@@ -52,7 +53,7 @@ export class ApiClient {
     let time = 2000;
     let action = () => { };
     if (pass) {
-      body = Translator.translate("sync.completed", { "time": ((new Date().getTime() - start.getTime()) / 1000) });
+      body = Translator.translate("sync.completed", { "time": timeDiff });
     } else {
       body = Translator.translate("sync.failed");
       time = 5000;
