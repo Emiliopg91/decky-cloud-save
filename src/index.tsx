@@ -7,7 +7,7 @@ import ConfigureBackendPage from "./pages/ConfigureBackendPage";
 import RenderRcloneLogsPage from "./pages/RenderRcloneLogsPage";
 import appState from "./helpers/state";
 import { Content } from "./pages/RenderDCSMenu";
-import { initialize, translate } from "./helpers/translator";
+import * as translator from "./helpers/translator";
 import * as storage from './helpers/storage';
 import * as backend from './helpers/backend';
 import { AppDetailsStore } from "./helpers/types";
@@ -17,6 +17,8 @@ declare const appDetailsStore: AppDetailsStore;
 export default definePlugin((serverApi: ServerAPI) => {
   appState.initialize(serverApi);
   backend.initialize(serverApi);
+  logger.initialize();
+  translator.initialize();
 
   serverApi.routerHook.addRoute("/dcs-configure-paths", () => <ConfigurePathsPage serverApi={serverApi} />, { exact: true });
   serverApi.routerHook.addRoute("/dcs-configure-backend", () => <ConfigureBackendPage serverApi={serverApi} />, { exact: true });
@@ -34,7 +36,7 @@ export default definePlugin((serverApi: ServerAPI) => {
         let toast = appState.currentState.toast_auto_sync === "true";
         if (e.bRunning) {
           if (toast) {
-            utils.toast(translate("synchronizing.savedata"), 2000);
+            utils.toast(translator.translate("synchronizing.savedata"), 2000);
           }
           syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
         } else {
@@ -47,7 +49,6 @@ export default definePlugin((serverApi: ServerAPI) => {
   });
 
   storage.clearAllSessionStorage()
-  initialize()
 
   return {
     title: <div className={staticClasses.Title}>Decky Cloud Save</div>,

@@ -1,27 +1,44 @@
 import { backend_call } from "./backend";
 
-const prefix: string = "DCS - ";
+const prefix: string = "[DCS]";
+
+let isDebugEnabled = false;
+let isInfoEnabled = true;
+let isWarnEnabled = true;
+
+export async function initialize() {
+    const level: string = await backend_call<{}, string>("get_log_level", {});
+
+    if (level == "DEBUG")
+        isDebugEnabled = true;
+    if (level == "DEBUG" || level == "INFO")
+        isInfoEnabled = true;
+    if (level == "DEBUG" || level == "INFO" || level == "WARN")
+        isWarnEnabled = true;
+
+    log("INFO", "Logger initialized at level '" + level + "'");
+}
 
 function log(lvl: string, ...args: any) {
     backend_call<{ level: string, msg: string }, void>("log", { level: lvl, msg: "" + args });
-}
-
-export function info(...args: any) {
-    log("info", ...args);
-    console.info(prefix, ...args);
+    console.log(prefix + "[" + lvl + "]", ...args);
 }
 
 export function debug(...args: any) {
-    log("debug", ...args);
-    console.debug(prefix, ...args);
+    if (isDebugEnabled)
+        log("DEBUG", ...args);
+}
+
+export function info(...args: any) {
+    if (isInfoEnabled)
+        log("INFO", ...args);
 }
 
 export function warn(...args: any) {
-    log("warn", ...args);
-    console.warn(prefix, ...args);
+    if (isWarnEnabled)
+        log("WARN", ...args);
 }
 
 export function error(...args: any) {
-    log("error", ...args);
-    console.error(prefix, ...args);
+    log("ERROR", ...args);
 }

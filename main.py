@@ -5,8 +5,6 @@ import process_utils
 from rclone_setup_manager import RcloneSetupManager
 from rclone_sync_manager import RcloneSyncManager
 
-decky_plugin.logger.setLevel("INFO")
-
 class Plugin:
     manager_setup = RcloneSetupManager()
     manager_sync = RcloneSyncManager()
@@ -62,6 +60,10 @@ class Plugin:
 
 # Configuration
 
+    async def get_log_level(self):
+        decky_plugin.logger.debug("Executing: get_log_level()")
+        return plugin_config.logger_level
+
     async def get_config(self):
         decky_plugin.logger.debug("Executing: get_config()")
         return plugin_config.get_config()
@@ -73,7 +75,8 @@ class Plugin:
 # Miscellanious
 
     async def log(self, level: str, msg: str) -> int:
-        match level:
+        decky_plugin.logger.debug("Executing: log()")
+        match level.lower():
             case "debug":
                 decky_plugin.logger.debug(msg)
             case "info":

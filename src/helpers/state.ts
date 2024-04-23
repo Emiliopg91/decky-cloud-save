@@ -99,7 +99,7 @@ export const useAppState = () => {
 
   useEffect(() => {
     const id = appState.subscribe((e) => {
-      logger.info("Rendering: " + JSON.stringify(e));
+      logger.debug("Rendering: " + JSON.stringify(e));
       setState(e);
     });
     return () => {
