@@ -53,13 +53,14 @@ export class ApiClient {
     let body;
     let time = 2000;
     let action = () => { };
+    Storage.setSessionStorageItem("syncLogs", await Backend.backend_call<{}, string>("getLastSyncLog", {}));
     if (pass) {
       body = Translator.translate("sync.completed", { "time": timeDiff });
+      action = () => { Navigation.Navigate("/dcs-sync-logs") };
     } else {
       body = Translator.translate("sync.failed");
       time = 5000;
-      action = () => { Navigation.Navigate("/dcs-configure-logs") };
-      Storage.setSessionStorageItem("rcloneLogs", await Backend.backend_call<{}, string>("getLastSyncLog", {}));
+      action = () => { Navigation.Navigate("/dcs-error-sync-logs") };
     }
 
     if (showToast || (!pass)) {

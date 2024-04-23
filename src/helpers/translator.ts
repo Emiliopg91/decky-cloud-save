@@ -30,22 +30,26 @@ export class Translator {
         Logger.debug("Initializing translator for " + currLang);
         const langKey = currLang.toLowerCase() as keyof typeof Language;
         const lang = Language[langKey] || Language.english;
-    
+
         if (currLang != "english" && lang == Language.english) {
             Logger.warn("No translator available, fallback to English");
         } else {
             Translator.currDictionary = { ...Translator.currDictionary, ...Translator.allDictionaries[lang] };
         }
     }
-    
+
     public static translate(text: string, replacements: Record<string, any> = {}) {
         let result: string = Translator.currDictionary[text] || text
-    
-        for (const key in replacements) {
-            const placeholder = `{{${key}}}`;
-            result = result.split(placeholder).join(replacements[key]);
+
+        if (result == text) {
+            Logger.warn("Missing translation for " + text)
+        } else {
+            for (const key in replacements) {
+                const placeholder = `{{${key}}}`;
+                result = result.split(placeholder).join(replacements[key]);
+            }
         }
-    
+
         return result;
     }
 

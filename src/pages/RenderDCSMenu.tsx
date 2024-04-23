@@ -1,6 +1,6 @@
 import { ButtonItem, Navigation, PanelSection, PanelSectionRow, ToggleField } from "decky-frontend-lib";
 import { useEffect, useState, VFC } from "react";
-import { FaSave } from "react-icons/fa";
+import { FaCloudUploadAlt, FaPlug, FaSave } from "react-icons/fa";
 import { FiEdit3 } from "react-icons/fi";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { ApiClient } from "../helpers/apiClient";
@@ -8,7 +8,8 @@ import Head from "../components/Head";
 import DeckyStoreButton from "../components/DeckyStoreButton";
 import { ApplicationState } from "../helpers/state";
 import { Translator } from "../helpers/translator";
-import { Logger } from "../helpers/logger";
+import { Storage } from "../helpers/storage";
+import { Backend } from "../helpers/backend";
 
 // TODO
 export const Content: VFC<{}> = () => {
@@ -68,6 +69,36 @@ export const Content: VFC<{}> = () => {
             }}
           >
             <DeckyStoreButton icon={<AiOutlineCloudUpload />}>{Translator.translate("cloud.provider")}</DeckyStoreButton>
+          </ButtonItem>
+        </PanelSectionRow>
+      </PanelSection>
+      <PanelSection title={Translator.translate("log.files")}>
+        <PanelSectionRow>
+          <ButtonItem layout="below" onClick={() => {
+            (async () => {
+              let logs = await Backend.backend_call<{}, string>("getPluginLog", {});
+              if (logs == "" || logs == null || logs == undefined) {
+                logs = Translator.translate("no.available.logs");
+              }
+              Storage.setSessionStorageItem("pluginLogs", logs);
+              Navigation.Navigate("/dcs-plugin-logs");
+              Navigation.CloseSideMenus();
+            })()
+          }}>
+            <DeckyStoreButton icon={<FaPlug />}>{Translator.translate("app.logs")}</DeckyStoreButton>
+          </ButtonItem>
+          <ButtonItem layout="below" disabled={appState.syncing === "true" || !hasProvider} onClick={() => {
+            (async () => {
+              let logs = await Backend.backend_call<{}, string>("getLastSyncLog", {});
+              if (logs == "" || logs == null || logs == undefined) {
+                logs = Translator.translate("no.available.logs");
+              }
+              Storage.setSessionStorageItem("syncLogs", logs);
+              Navigation.Navigate("/dcs-sync-logs");
+              Navigation.CloseSideMenus();
+            })()
+          }}>
+            <DeckyStoreButton icon={<FaCloudUploadAlt />}>{Translator.translate("sync.logs")}</DeckyStoreButton>
           </ButtonItem>
         </PanelSectionRow>
       </PanelSection>

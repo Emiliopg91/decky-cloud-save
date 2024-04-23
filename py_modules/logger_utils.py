@@ -14,7 +14,6 @@ def log(level: str, msg: str) -> int:
 
 
 def getLastSyncLog() -> str:
-    decky_plugin.logger.error("Empezamos getLastSyncLog")
     record: bool = False
     log: str = ""
     for line in reversed(list(open(decky_plugin.DECKY_PLUGIN_LOG))):
@@ -23,9 +22,13 @@ def getLastSyncLog() -> str:
                 record = True
         else:
             if "Running command: /home/deck/homebrew/plugins/decky-cloud-save/bin/rcloneLauncher" in line.strip():
-                log = line + '\n' + " " + '\n' + log
                 break
             else:
                 log = line + '\n' + log  
-    decky_plugin.logger.error("Saliendo de getLastSyncLog")
+    return log
+
+def getPluginLog() -> str:
+    log: str = ""
+    for line in list(open(decky_plugin.DECKY_PLUGIN_LOG)):
+        log = log + line + '\n' 
     return log

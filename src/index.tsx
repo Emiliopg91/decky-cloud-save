@@ -1,10 +1,7 @@
 import { definePlugin, ServerAPI, staticClasses, LifetimeNotification } from "decky-frontend-lib";
 import { Toast } from "./helpers/toast";
 import { Logger } from "./helpers/logger";
-import ConfigurePathsPage from "./pages/ConfigurePathsPage";
 import { ApiClient } from "./helpers/apiClient";
-import ConfigureBackendPage from "./pages/ConfigureBackendPage";
-import RenderRcloneLogsPage from "./pages/RenderRcloneLogsPage";
 import { ApplicationState } from "./helpers/state";
 import { Content } from "./pages/RenderDCSMenu";
 import { Translator } from "./helpers/translator";
@@ -12,6 +9,11 @@ import { Storage } from './helpers/storage';
 import { Backend } from './helpers/backend';
 import { AppDetailsStore } from "./helpers/types";
 import { FaSave } from "react-icons/fa";
+import ConfigurePathsPage from "./pages/ConfigurePathsPage";
+import ConfigureBackendPage from "./pages/ConfigureBackendPage";
+import RenderSyncErrorLogPage from "./pages/RenderSyncErrorLogPage";
+import RenderSyncLogPage from "./pages/RenderSyncLogPage";
+import RenderPluginLogPage from "./pages/RenderPluginLogPage";
 
 declare const appDetailsStore: AppDetailsStore;
 
@@ -23,7 +25,9 @@ export default definePlugin((serverApi: ServerAPI) => {
 
   serverApi.routerHook.addRoute("/dcs-configure-paths", () => <ConfigurePathsPage serverApi={serverApi} />, { exact: true });
   serverApi.routerHook.addRoute("/dcs-configure-backend", () => <ConfigureBackendPage serverApi={serverApi} />, { exact: true });
-  serverApi.routerHook.addRoute("/dcs-configure-logs", () => <RenderRcloneLogsPage />, { exact: true });
+  serverApi.routerHook.addRoute("/dcs-error-sync-logs", () => <RenderSyncErrorLogPage />, { exact: true });
+  serverApi.routerHook.addRoute("/dcs-sync-logs", () => <RenderSyncLogPage />, { exact: true });
+  serverApi.routerHook.addRoute("/dcs-plugin-logs", () => <RenderPluginLogPage />, { exact: true });
 
   const { unregister: removeGameExecutionListener } = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: LifetimeNotification) => {
     const game = appDetailsStore.GetAppDetails(e.unAppID)!;
@@ -70,7 +74,9 @@ return {
   onDismount() {
     serverApi.routerHook.removeRoute("/dcs-configure-paths");
     serverApi.routerHook.removeRoute("/dcs-configure-backend");
-    serverApi.routerHook.removeRoute("/dcs-configure-logs");
+    serverApi.routerHook.removeRoute("/dcs-error-sync-logs");
+    serverApi.routerHook.removeRoute("/dcs-sync-logs");
+    serverApi.routerHook.removeRoute("/dcs-plugin-logs");
     removeGameExecutionListener();
     Storage.clearAllSessionStorage()
   },

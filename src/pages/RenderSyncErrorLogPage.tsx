@@ -6,14 +6,14 @@ import { Storage } from "../helpers/storage";
 import { Toast } from "../helpers/toast";
 
 
-export default function ConfigurePathsPage() {
+export default function RenderSyncErrorLogPage() {
   Navigation.CloseSideMenus();
   let isHidden = Storage.getSessionStorageItem("rcloneLogs")?.indexOf("Must run --resync") == -1;
 
   return (
     <Container title={Translator.translate("rclone.error.logs")}>
       <div style={{ maxHeight: "300px" }}>
-        <pre style={{ overflowY: 'scroll', whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: "smaller", maxHeight: "300px" }}>{Storage.getSessionStorageItem("rcloneLogs")?.replace(/\n{2,}/g, '\n')}</pre>
+        <pre style={{ overflowY: 'scroll', whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: "smaller", maxHeight: "300px" }}>{Storage.getSessionStorageItem("syncLogs")?.replace(/\n{2,}/g, '\n')}</pre>
       </div>
       <div>
         <button onClick={() => {

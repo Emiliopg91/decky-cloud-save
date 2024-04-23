@@ -82,8 +82,12 @@ class Plugin:
         return logger_utils.log(level, msg)
     
     async def getLastSyncLog(self) -> str:
-        decky_plugin.logger.error("Executing: RcloneSyncManager.getLastSyncLog()")
+        decky_plugin.logger.debug("Executing: getLastSyncLog()")
         return logger_utils.getLastSyncLog()
+    
+    async def getPluginLog(self) -> str:
+        decky_plugin.logger.debug("Executing: getPluginLog()")
+        return logger_utils.getPluginLog()
 
 # Lifecycle
 
