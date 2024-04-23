@@ -1,24 +1,25 @@
 import { definePlugin, ServerAPI, staticClasses, LifetimeNotification } from "decky-frontend-lib";
-import * as utils from "./helpers/toast";
-import * as logger from "./helpers/logger";
+import { Toast } from "./helpers/toast";
+import { Logger } from "./helpers/logger";
 import ConfigurePathsPage from "./pages/ConfigurePathsPage";
-import { syncOnEnd, syncOnLaunch } from "./helpers/apiClient";
+import { ApiClient } from "./helpers/apiClient";
 import ConfigureBackendPage from "./pages/ConfigureBackendPage";
 import RenderRcloneLogsPage from "./pages/RenderRcloneLogsPage";
-import appState from "./helpers/state";
+import { ApplicationState } from "./helpers/state";
 import { Content } from "./pages/RenderDCSMenu";
-import * as translator from "./helpers/translator";
-import * as storage from './helpers/storage';
-import * as backend from './helpers/backend';
+import { Translator } from "./helpers/translator";
+import { Storage } from './helpers/storage';
+import { Backend } from './helpers/backend';
 import { AppDetailsStore } from "./helpers/types";
+import { FaSave } from "react-icons/fa";
 
 declare const appDetailsStore: AppDetailsStore;
 
 export default definePlugin((serverApi: ServerAPI) => {
-  appState.initialize(serverApi);
-  backend.initialize(serverApi);
-  logger.initialize();
-  translator.initialize();
+  ApplicationState.initialize(serverApi);
+  Backend.initialize(serverApi);
+  Logger.initialize();
+  Translator.initialize();
 
   serverApi.routerHook.addRoute("/dcs-configure-paths", () => <ConfigurePathsPage serverApi={serverApi} />, { exact: true });
   serverApi.routerHook.addRoute("/dcs-configure-backend", () => <ConfigureBackendPage serverApi={serverApi} />, { exact: true });
@@ -26,40 +27,40 @@ export default definePlugin((serverApi: ServerAPI) => {
 
   const { unregister: removeGameExecutionListener } = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: LifetimeNotification) => {
     const game = appDetailsStore.GetAppDetails(e.unAppID)!;
-    
-    logger.info("Received game status change for " + game.strDisplayName + "(" + e.unAppID + "). Running: " + e.bRunning);
-    if (appState.currentState.sync_on_game_exit === "true") {
+
+    Logger.info("Received game status change for " + game.strDisplayName + "(" + e.unAppID + "). Running: " + e.bRunning);
+    if (ApplicationState.getAppState().currentState.sync_on_game_exit === "true") {
       if (game.bCloudAvailable && game.bCloudEnabledForApp && game.bCloudEnabledForAccount) {
-        logger.info("Skipping due to Cloud Save");
+        Logger.info("Skipping due to Cloud Save");
       } else {
-        logger.info("Synchronizing")
-        let toast = appState.currentState.toast_auto_sync === "true";
+        Logger.info("Synchronizing")
+        let toast = ApplicationState.getAppState().currentState.toast_auto_sync === "true";
         if (e.bRunning) {
           if (toast) {
-            utils.toast(translator.translate("synchronizing.savedata"), 2000);
+            Toast.toast(Translator.translate("synchronizing.savedata"), 2000);
           }
-          syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
+          ApiClient.syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
         } else {
-          syncOnEnd(toast);
+          ApiClient.syncOnEnd(toast);
         }
       }
     } else {
-      logger.info("No futher actions")
+      Logger.info("No futher actions")
     }
   });
 
-  storage.clearAllSessionStorage()
+  Storage.clearAllSessionStorage()
 
   return {
     title: <div className={staticClasses.Title}>Decky Cloud Save</div>,
     content: <Content />,
-    icon: <utils.pluginIcon />,
+    icon: <FaSave />,
     onDismount() {
       serverApi.routerHook.removeRoute("/dcs-configure-paths");
       serverApi.routerHook.removeRoute("/dcs-configure-backend");
       serverApi.routerHook.removeRoute("/dcs-configure-logs");
       removeGameExecutionListener();
-      storage.clearAllSessionStorage()
+      Storage.clearAllSessionStorage()
     },
   };
 });

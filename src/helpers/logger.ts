@@ -1,44 +1,47 @@
-import { backend_call } from "./backend";
+import { Backend } from "./backend";
 
-const prefix: string = "[DCS]";
+export class Logger {
 
-let isDebugEnabled = false;
-let isInfoEnabled = true;
-let isWarnEnabled = true;
+    private static prefix: string = "[DCS]";
 
-export async function initialize() {
-    const level: string = await backend_call<{}, string>("get_log_level", {});
+    private static isDebugEnabled = false;
+    private static isInfoEnabled = true;
+    private static isWarnEnabled = true;
 
-    if (level == "DEBUG")
-        isDebugEnabled = true;
-    if (level == "DEBUG" || level == "INFO")
-        isInfoEnabled = true;
-    if (level == "DEBUG" || level == "INFO" || level == "WARN")
-        isWarnEnabled = true;
+    public static async initialize() {
+        const level: string = await Backend.backend_call<{}, string>("get_log_level", {});
 
-    log("INFO", "Logger initialized at level '" + level + "'");
-}
+        if (level == "DEBUG")
+            Logger.isDebugEnabled = true;
+        if (level == "DEBUG" || level == "INFO")
+            Logger.isInfoEnabled = true;
+        if (level == "DEBUG" || level == "INFO" || level == "WARN")
+            Logger.isWarnEnabled = true;
 
-function log(lvl: string, ...args: any) {
-    backend_call<{ level: string, msg: string }, void>("log", { level: lvl, msg: "" + args });
-    console.log(prefix + "[" + lvl + "]", ...args);
-}
+        Logger.log("INFO", "Logger initialized at level '" + level + "'");
+    }
 
-export function debug(...args: any) {
-    if (isDebugEnabled)
-        log("DEBUG", ...args);
-}
+    private static log(lvl: "DEBUG" | "INFO" | "WARN" | "ERROR", ...args: any) {
+        Backend.backend_call<{ level: string, msg: string }, void>("log", { level: lvl, msg: "" + args });
+        console.log(Logger.prefix + "[" + lvl + "]", ...args);
+    }
 
-export function info(...args: any) {
-    if (isInfoEnabled)
-        log("INFO", ...args);
-}
+    public static debug(...args: any) {
+        if (Logger.isDebugEnabled)
+            Logger.log("DEBUG", ...args);
+    }
 
-export function warn(...args: any) {
-    if (isWarnEnabled)
-        log("WARN", ...args);
-}
+    public static info(...args: any) {
+        if (Logger.isInfoEnabled)
+            Logger.log("INFO", ...args);
+    }
 
-export function error(...args: any) {
-    log("ERROR", ...args);
+    public static warn(...args: any) {
+        if (Logger.isWarnEnabled)
+            Logger.log("WARN", ...args);
+    }
+
+    public static error(...args: any) {
+        Logger.log("ERROR", ...args);
+    }
 }
