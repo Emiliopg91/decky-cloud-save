@@ -28,24 +28,29 @@ export default definePlugin((serverApi: ServerAPI) => {
   const { unregister: removeGameExecutionListener } = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: LifetimeNotification) => {
     const game = appDetailsStore.GetAppDetails(e.unAppID)!;
 
-    Logger.info("Received game status change for " + game.strDisplayName + "(" + e.unAppID + "). Running: " + e.bRunning);
+    if (e.bRunning) {
+      Logger.info("Started game '" + game.strDisplayName + "' (" + e.unAppID + ")");
+    } else {
+      Logger.info("Stopped game '" + game.strDisplayName + "' (" + e.unAppID + ")");
+    }
     if (ApplicationState.getAppState().currentState.sync_on_game_exit === "true") {
-      if (game.bCloudAvailable && game.bCloudEnabledForApp && game.bCloudEnabledForAccount) {
+      /*if (game.bCloudAvailable && game.bCloudEnabledForApp && game.bCloudEnabledForAccount) {
         Logger.info("Skipping due to Cloud Save");
-      } else {
-        Logger.info("Synchronizing")
-        let toast = ApplicationState.getAppState().currentState.toast_auto_sync === "true";
-        if (e.bRunning) {
-          if (toast) {
-            Toast.toast(Translator.translate("synchronizing.savedata"), 2000);
-          }
-          ApiClient.syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
-        } else {
-          ApiClient.syncOnEnd(toast);
+      } else {*/
+      Logger.info("Synchronizing")
+      let toast = ApplicationState.getAppState().currentState.toast_auto_sync === "true";
+      if (e.bRunning) {
+        if (toast) {
+          Toast.toast(Translator.translate("synchronizing.savedata"), 2000);
         }
+        ApiClient.syncOnLaunch(toast, e.nInstanceID); // nInstanceID is Linux Process PID
+      } else {
+        ApiClient.syncOnEnd(toast);
       }
+      /*}
     } else {
       Logger.info("No futher actions")
+    }*/
     }
   });
 
