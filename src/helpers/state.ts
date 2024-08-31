@@ -9,6 +9,7 @@ type State = {
   experimental_menu: string;
   toast_auto_sync: string;
   destination_directory: string;
+  playing: string
 };
 
 class AppState {
@@ -20,7 +21,8 @@ class AppState {
     bisync_enabled: "false",
     experimental_menu: "false",
     toast_auto_sync: "true",
-    destination_directory: "decky-cloud-save"
+    destination_directory: "decky-cloud-save",
+    playing: "false"
   };
 
   private _serverApi: ServerAPI = null!;
@@ -92,10 +94,14 @@ class AppState {
 }
 
 export class ApplicationState {
+
+  private constructor(){
+  }
+  
   private static appState = new AppState();
   
-  public static initialize(serverApi: ServerAPI) {
-    this.appState.initialize(serverApi);
+  public static async initialize(serverApi: ServerAPI) {
+    await this.appState.initialize(serverApi);
   }
 
   public static useAppState = () => {
